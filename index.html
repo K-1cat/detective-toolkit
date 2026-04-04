@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Detective Toolkit - Who Ate the Cookies?</title>
+  <style>
+    body { background: #111; color: #0f0; font-family: monospace; } /* 探偵風 */
+    /* カードやボタンのCSS */
+  </style>
+</head>
+<body>
+  <h1>🔍 Detective Toolkit</h1>
+  <p>Welcome, Detective. Use this to crack the case.</p>
+
+  <!-- 1. Evidence Log -->
+  <section>
+    <h2>Evidence Log (暗号記録)</h2>
+    <textarea id="newEvidence" placeholder="場所と暗号を入力..."></textarea>
+    <button onclick="addEvidence()">Add Evidence</button>
+    <ul id="evidenceList"></ul>
+  </section>
+
+  <!-- 2. Cipher Decoder -->
+  <section>
+    <h2>Cipher Decoder (暗号解読)</h2>
+    <select id="cipherType">
+      <option value="caesar">Caesar Cipher (シフト)</option>
+      <option value="atbash">Atbash (逆アルファベット)</option>
+      <option value="number">Number to Letter (1=A)</option>
+    </select>
+    <input id="shift" type="number" placeholder="Shift (例: 3)" value="3">
+    <textarea id="cipherInput" placeholder="暗号を貼り付け..."></textarea>
+    <button onclick="decode()">Decode</button>
+    <div id="decodedOutput"></div>
+  </section>
+
+  <!-- 3. Suspect Profiles -->
+  <section>
+    <h2>Suspect Profiles (容疑者)</h2>
+    <!-- ここに6人のカードをJSで生成 -->
+  </section>
+
+  <script>
+    // ここにJavaScript（addEvidence, decode関数, 容疑者データなど）を書く
+    const suspects = [
+      {name: "Brother Kanoa", desc: "Your brother who stays up late..."},
+      // 他の5人も
+    ];
+  </script>
+</body>
+</html>
