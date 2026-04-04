@@ -14,85 +14,16 @@
 </head>
 
 
-<script>
-    // Evidence Log
-    function addEvidence() {
-        const location = document.getElementById('locationInput').value.trim();
-        const evidence = document.getElementById('evidenceInput').value.trim();
-        if (!evidence) return;
-
-        const list = document.getElementById('evidenceList');
-        const item = document.createElement('li');
-        item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between";
-        item.innerHTML = `
-            <div>
-                <span class="text-teal-400">${location ? location + ': ' : ''}</span>${evidence}
-            </div>
-            <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500">×</button>
-        `;
-        list.appendChild(item);
-
-        // localStorage保存（ページを閉じても残る）
-        let logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
-        logs.push({location, evidence});
-        localStorage.setItem('cookieEvidence', JSON.stringify(logs));
-    }
-
-    // ページ読み込み時に復元
-    window.onload = () => {
-        const logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
-        const list = document.getElementById('evidenceList');
-        logs.forEach(log => {
-            // 同様にliを作成して追加（コード省略）
-        });
-    };
-
-    // Cipher Decoder
-    function decodeCipher() {
-        const type = document.getElementById('cipherType').value;
-        const input = document.getElementById('cipherInput').value.trim().toUpperCase();
-        let output = '';
-
-        if (type === 'caesar') {
-            const shift = parseInt(document.getElementById('shift').value) || 3;
-            output = input.split('').map(char => {
-                if (char.match(/[A-Z]/)) {
-                    return String.fromCharCode(((char.charCodeAt(0) - 65 - shift + 26) % 26) + 65);
-                }
-                return char;
-            }).join('');
-        } 
-        else if (type === 'atbash') {
-            output = input.split('').map(char => {
-                if (char.match(/[A-Z]/)) {
-                    return String.fromCharCode(155 - char.charCodeAt(0)); // A(65)↔Z(90)
-                }
-                return char;
-            }).join('');
-        } 
-        else if (type === 'number') {
-            output = input.split(/\s+/).map(num => {
-                const n = parseInt(num);
-                return (n >= 1 && n <= 26) ? String.fromCharCode(n + 64) : num;
-            }).join(' ');
-        }
-
-        document.getElementById('decodedOutput').innerHTML = 
-            `<span class="text-teal-400">Decoded:</span><br><span class="text-lg">${output || 'Nothing to decode'}</span>`;
-    }
-</script>
-
-    
 <body class="bg-zinc-950 text-zinc-100 min-h-screen">
 
     <!-- Navigation -->
     <nav class="bg-zinc-900 border-b border-zinc-800">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Toolkit</h1>
+            <h1 class="text-2xl font-bold">🔍 DETECTIVE TOOLKIT</h1>
             <div class="space-x-6">
-                <a href="#about" class="hover:text-teal-400 transition">About</a>
-                <a href="#suspects" class="hover:text-teal-400 transition">Suspects</a>
-                <a href="#tools" class="hover:text-teal-400 transition">Tools</a>
+                <a href="#about" class="hover:text-teal-400 transition">CASE</a>
+                <a href="#suspects" class="hover:text-teal-400 transition">SUSPECTS</a>
+                <a href="#tools" class="hover:text-teal-400 transition">TOOLS</a>
             </div>
         </div>
     </nav>
@@ -101,84 +32,54 @@
     <header class="max-w-4xl mx-auto px-6 py-24 text-center">
         <h2 class="text-6xl font-bold mb-4">Who Ate the Cookies?</h2>
         <p class="text-2xl text-zinc-400 mb-8">Case File & Encrypted Evidence Decoder</p>
-        <p class="max-w-md mx-auto text-zinc-300 mb-10">
-            Stolen cookies and 6 suspects. Can you catch the thief?
-        </p>
-        <a href="#about" 
-           class="inline-block bg-teal-500 hover:bg-teal-600 text-black font-medium px-8 py-3 rounded-full transition">
-            Learn more about the incident
-        </a>
     </header>
 
-    <!-- About Section -->
+    <!-- About / Case Briefing -->
     <section id="about" class="bg-zinc-900 py-20">
         <div class="max-w-4xl mx-auto px-6">
             <h3 class="text-4xl font-bold text-center mb-12">The Incident</h3>
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <p class="text-zinc-300 leading-relaxed text-lg">
-                        Last night, someone broke into the living room cookie jar and stole a tons of cookies.
-                        The thief left behind a trail of encrypted evidence scattered throughout the house.
-                        We have six suspects. Each has a motive, opportunity, and suspicious habits.
-                        Your mission is to find the hidden evidence, decode the messages, solve the riddles, and piece together the truth.
-                    </p>
-                </div>
-                <div class="bg-zinc-800 p-8 rounded-2xl text-center">
-                    <div class="w-32 h-32 mx-auto bg-teal-500 rounded-full flex items-center justify-center text-6xl mb-6">
-                        🍪
-                    </div>
-                    <p class="text-zinc-400">Such Delicious Cookie!</p>
-                </div>
-            </div>
+            <p class="text-zinc-300 leading-relaxed text-lg">
+                Last night, someone stole a large amount of cookies from the living room jar.<br>
+                The thief left encrypted evidence and tricky riddles all over the house.<br><br>
+                Your mission: Find the evidence, decode the messages, solve the riddles, and identify the culprit.
+            </p>
         </div>
     </section>
 
-    <!-- Suspect Section -->
+    <!-- Suspects -->
     <section id="suspects" class="py-20">
         <div class="max-w-4xl mx-auto px-6">
             <h3 class="text-4xl font-bold text-center mb-12">Suspect Profiles</h3>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
                     <h4 class="font-semibold text-xl mb-2">Brother Kanoa</h4>
-                    <p class="text-zinc-400">
-                        Your brother who games late at night. Loves snacks and knows every corner of the house.
-                    </p>
+                    <p class="text-zinc-400">Your brother who games late at night. Loves snacks and knows every corner of the house.</p>
                 </div>
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
                     <h4 class="font-semibold text-xl mb-2">Mr. Shadow</h4>
-                    <p class="text-zinc-400">
-                        A quiet neighbor who moves like a shadow. Seen near the kitchen at night and secretly loves sweets.
-                    </p>
+                    <p class="text-zinc-400">A quiet neighbor who moves like a shadow. Seen near the kitchen at night and secretly loves sweets.</p>
                 </div>
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
                     <h4 class="font-semibold text-xl mb-2">Ms. Sweettooth</h4>
-                    <p class="text-zinc-400">
-                        A friend with a spare key who always praises your cookies. Has an obvious sweet tooth.
-                    </p>
+                    <p class="text-zinc-400">A friend with a spare key who always praises your cookies. Has an obvious sweet tooth.</p>
                 </div>
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
                     <h4 class="font-semibold text-xl mb-2">Captain Crumb</h4>
-                    <p class="text-zinc-400">
-                        An eccentric man who leaves crumbs everywhere. He was in the house that night telling sailing stories.
-                    </p>
+                    <p class="text-zinc-400">An eccentric man who leaves crumbs everywhere. He was in the house that night telling sailing stories.</p>
                 </div>
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
                     <h4 class="font-semibold text-xl mb-2">Lady Midnight</h4>
-                    <p class="text-zinc-400">
-                        A mysterious woman active only at night. Loves secretive adventures and was heard near the piano.
-                    </p>
+                    <p class="text-zinc-400">A mysterious woman active only at night. Loves secretive adventures and was heard near the piano.</p>
                 </div>
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
                     <h4 class="font-semibold text-xl mb-2">Professor Riddle</h4>
-                    <p class="text-zinc-400">
-                        A puzzle-loving professor who created many of the encrypted clues. He denies eating any cookies.
-                    </p>
+                    <p class="text-zinc-400">A puzzle-loving professor who created many of the encrypted clues. He denies eating any cookies.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Tools Section を置き換え -->
+    <!-- Tools Section -->
     <section id="tools" class="bg-zinc-900 py-20">
         <div class="max-w-4xl mx-auto px-6">
             <h3 class="text-4xl font-bold text-center mb-12 text-teal-400">Detective Tools</h3>
@@ -187,9 +88,9 @@
             <div class="mb-16">
                 <h4 class="text-2xl font-semibold mb-4 flex items-center gap-2">📝 Evidence Log</h4>
                 <div class="flex gap-3 mb-4">
-                    <input id="locationInput" type="text" placeholder="場所 (例: 冷蔵庫)" 
+                    <input id="locationInput" type="text" placeholder="Place (ex: Fridge)" 
                            class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
-                    <input id="evidenceInput" type="text" placeholder="発見した暗号やメモ" 
+                    <input id="evidenceInput" type="text" placeholder="Evidence or Notes" 
                            class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
                     <button onclick="addEvidence()" 
                             class="bg-teal-500 hover:bg-teal-600 text-black font-medium px-6 py-3 rounded-xl transition">
@@ -198,25 +99,32 @@
                 </div>
                 <ul id="evidenceList" class="space-y-3 text-sm"></ul>
             </div>
-    
-            <!-- Cipher Decoder -->
-            <div class="grid md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-2xl font-semibold mb-4">🔐 Cipher Decoder</h4>
-                    <select id="cipherType" class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full mb-4">
-                        <option value="caesar">Caesar Cipher (Shift)</option>
-                        <option value="number">Number → Letter (1=A, 2=B...)</option>
-                    </select>
-                    <input id="shift" type="number" value="3" placeholder="Shift number (Caesar)" 
-                           class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full mb-4">
-                    <textarea id="cipherInput" rows="3" placeholder="Code goes here..." 
-                              class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full"></textarea>
-                    <button onclick="decodeCipher()" 
-                            class="mt-4 w-full bg-teal-500 hover:bg-teal-600 text-black font-medium py-3 rounded-xl">
-                        Decode
-                    </button>
-                    <div id="decodedOutput" class="mt-6 p-5 bg-zinc-950 border border-teal-900 rounded-2xl min-h-[80px] font-mono"></div>
+            
+            <!-- Caesar Cipher Tool -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8">
+                <h4 class="text-xl font-semibold mb-6">Caesar Cipher Decoder</h4>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm text-zinc-400 mb-2">Shift Number</label>
+                        <input id="shift" type="number" value="3" 
+                               class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full text-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-zinc-400 mb-2">Enter code</label>
+                        <textarea id="cipherInput" rows="3" placeholder="ex: WKH WKLHI OLNHV FRRNLHV"
+                                  class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full"></textarea>
+                    </div>
                 </div>
+
+                <button onclick="decodeCaesar()" 
+                        class="mt-6 w-full bg-teal-500 hover:bg-teal-600 text-black font-bold py-4 rounded-2xl text-lg transition">
+                    DECODE
+                </button>
+
+                <div id="decodedOutput" class="mt-8 p-6 bg-black border border-teal-900 rounded-2xl font-mono text-lg min-h-[80px]">
+                </div>
+            </div>
     
                 <!-- Additional Tools Example -->
                 <div>
@@ -233,16 +141,11 @@
         </div>
     </section>
 
-    <!-- Footer / Contact -->
-    <footer id="contact" class="py-12 border-t border-zinc-800">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <p class="text-zinc-400">Catch the thief at all costs</p>
-            <p class="mt-4">
-                Created by the Detective Team 01
-            </p>
-        </div>
+    <!-- Footer  -->
+    <footer class="py-10 text-center text-zinc-500 text-sm">
+        <p>Who Ate the Cookies? — Detective Toolkit</p>
     </footer>
-
+    
     <!-- Tailwind script to make classes work -->
     <script>
         tailwind.config = {
@@ -251,6 +154,69 @@
                 extend: {}
             }
         }
+        
+        // Evidence Log
+        function addEvidence() {
+            const location = document.getElementById('locationInput').value.trim();
+            const evidence = document.getElementById('evidenceInput').value.trim();
+            if (!evidence) return;
+
+            const list = document.getElementById('evidenceList');
+            const item = document.createElement('li');
+            item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between items-center";
+            item.innerHTML = `
+                <div>
+                    ${location ? `<span class="text-teal-400">${location}:</span> ` : ''}
+                    ${evidence}
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
+            `;
+            list.appendChild(item);
+
+            // localStorageに保存
+            let logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
+            logs.push({location, evidence, time: new Date().toLocaleTimeString()});
+            localStorage.setItem('cookieEvidence', JSON.stringify(logs));
+        }
+
+        // Caesar Cipher Decoder
+        function decodeCaesar() {
+            const shift = parseInt(document.getElementById('shift').value) || 3;
+            const input = document.getElementById('cipherInput').value.trim().toUpperCase();
+            let output = '';
+
+            output = input.split('').map(char => {
+                if (char.match(/[A-Z]/)) {
+                    // シーザー暗号（右シフトの場合の復号は -shift）
+                    return String.fromCharCode(((char.charCodeAt(0) - 65 - shift + 26) % 26) + 65);
+                }
+                return char;
+            }).join('');
+
+            const outputDiv = document.getElementById('decodedOutput');
+            outputDiv.innerHTML = `
+                <span class="text-teal-400 block text-sm mb-1">DECODED RESULT (${shift} shift)</span>
+                <span class="text-2xl">${output || 'No text to decode'}</span>
+            `;
+        }
+
+        // ページ読み込み時にEvidence Logを復元
+        window.onload = function() {
+            const logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
+            const list = document.getElementById('evidenceList');
+            logs.forEach(log => {
+                const item = document.createElement('li');
+                item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between items-center";
+                item.innerHTML = `
+                    <div>
+                        ${log.location ? `<span class="text-teal-400">${log.location}:</span> ` : ''}
+                        ${log.evidence}
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
+                `;
+                list.appendChild(item);
+            });
+        };
     </script>
 </body>
 </html>
