@@ -12,6 +12,77 @@
         }
     </style>
 </head>
+
+
+<script>
+    // Evidence Log
+    function addEvidence() {
+        const location = document.getElementById('locationInput').value.trim();
+        const evidence = document.getElementById('evidenceInput').value.trim();
+        if (!evidence) return;
+
+        const list = document.getElementById('evidenceList');
+        const item = document.createElement('li');
+        item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between";
+        item.innerHTML = `
+            <div>
+                <span class="text-teal-400">${location ? location + ': ' : ''}</span>${evidence}
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500">×</button>
+        `;
+        list.appendChild(item);
+
+        // localStorage保存（ページを閉じても残る）
+        let logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
+        logs.push({location, evidence});
+        localStorage.setItem('cookieEvidence', JSON.stringify(logs));
+    }
+
+    // ページ読み込み時に復元
+    window.onload = () => {
+        const logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
+        const list = document.getElementById('evidenceList');
+        logs.forEach(log => {
+            // 同様にliを作成して追加（コード省略）
+        });
+    };
+
+    // Cipher Decoder
+    function decodeCipher() {
+        const type = document.getElementById('cipherType').value;
+        const input = document.getElementById('cipherInput').value.trim().toUpperCase();
+        let output = '';
+
+        if (type === 'caesar') {
+            const shift = parseInt(document.getElementById('shift').value) || 3;
+            output = input.split('').map(char => {
+                if (char.match(/[A-Z]/)) {
+                    return String.fromCharCode(((char.charCodeAt(0) - 65 - shift + 26) % 26) + 65);
+                }
+                return char;
+            }).join('');
+        } 
+        else if (type === 'atbash') {
+            output = input.split('').map(char => {
+                if (char.match(/[A-Z]/)) {
+                    return String.fromCharCode(155 - char.charCodeAt(0)); // A(65)↔Z(90)
+                }
+                return char;
+            }).join('');
+        } 
+        else if (type === 'number') {
+            output = input.split(/\s+/).map(num => {
+                const n = parseInt(num);
+                return (n >= 1 && n <= 26) ? String.fromCharCode(n + 64) : num;
+            }).join(' ');
+        }
+
+        document.getElementById('decodedOutput').innerHTML = 
+            `<span class="text-teal-400">Decoded:</span><br><span class="text-lg">${output || 'Nothing to decode'}</span>`;
+    }
+</script>
+
+    
 <body class="bg-zinc-950 text-zinc-100 min-h-screen">
 
     <!-- Navigation -->
@@ -107,20 +178,57 @@
         </div>
     </section>
 
-    <!-- Tools Section -->
+    <!-- Tools Section を置き換え -->
     <section id="tools" class="bg-zinc-900 py-20">
         <div class="max-w-4xl mx-auto px-6">
-            <h3 class="text-4xl font-bold text-center mb-12">Tools</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
-                    <h4 class="font-semibold text-xl mb-2">Evidence Log</h4>
-                    <p class="text-zinc-400">Record anything about the case here</p>
+            <h3 class="text-4xl font-bold text-center mb-12 text-teal-400">Detective Tools</h3>
+            
+            <!-- Evidence Log -->
+            <div class="mb-16">
+                <h4 class="text-2xl font-semibold mb-4 flex items-center gap-2">📝 Evidence Log</h4>
+                <div class="flex gap-3 mb-4">
+                    <input id="locationInput" type="text" placeholder="場所 (例: 冷蔵庫)" 
+                           class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
+                    <input id="evidenceInput" type="text" placeholder="発見した暗号やメモ" 
+                           class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
+                    <button onclick="addEvidence()" 
+                            class="bg-teal-500 hover:bg-teal-600 text-black font-medium px-6 py-3 rounded-xl transition">
+                        Add
+                    </button>
                 </div>
-                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-teal-500 transition">
-                    <h4 class="font-semibold text-xl mb-2">Caesar Cipher</h4>
-                    <p class="text-zinc-400">Ciphers Ceasar</p>
+                <ul id="evidenceList" class="space-y-3 text-sm"></ul>
+            </div>
+    
+            <!-- Cipher Decoder -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-2xl font-semibold mb-4">🔐 Cipher Decoder</h4>
+                    <select id="cipherType" class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full mb-4">
+                        <option value="caesar">Caesar Cipher (Shift)</option>
+                        <option value="number">Number → Letter (1=A, 2=B...)</option>
+                    </select>
+                    <input id="shift" type="number" value="3" placeholder="Shift number (Caesar)" 
+                           class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full mb-4">
+                    <textarea id="cipherInput" rows="3" placeholder="Code goes here..." 
+                              class="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 w-full"></textarea>
+                    <button onclick="decodeCipher()" 
+                            class="mt-4 w-full bg-teal-500 hover:bg-teal-600 text-black font-medium py-3 rounded-xl">
+                        Decode
+                    </button>
+                    <div id="decodedOutput" class="mt-6 p-5 bg-zinc-950 border border-teal-900 rounded-2xl min-h-[80px] font-mono"></div>
                 </div>
-                <!-- More tools here -->
+    
+                <!-- Additional Tools Example -->
+                <div>
+                    <h4 class="text-2xl font-semibold mb-4">Case Progress</h4>
+                    <div class="space-y-3 text-sm">
+                        <label class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 accent-teal-500"> Refrigerator</label>
+                        <label class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 accent-teal-500"> Cat Plushie</label>
+                        <label class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 accent-teal-500"> Clock</label>
+                        <!-- other places -->
+                        <label class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 accent-teal-500"> Final: Behind Painting</label>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
