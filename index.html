@@ -86,7 +86,14 @@
             
             <!-- Evidence Log -->
             <div class="mb-16">
-                <h4 class="text-2xl font-semibold mb-4 flex items-center gap-2">📝 Evidence Log</h4>
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xl font-semibold">📝 Evidence Log</h4>
+                    <button onclick="clearAllEvidence()" 
+                            class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2 rounded-xl transition">
+                        Clear All
+                    </button>
+                </div>
+                
                 <div class="flex gap-3 mb-4">
                     <input id="locationInput" type="text" placeholder="Place (ex: Fridge)" 
                            class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
@@ -160,21 +167,52 @@
             `;
             list.appendChild(item);
 
-            // localStorageに保存
-            let logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
-            logs.push({location, evidence, time: new Date().toLocaleTimeString()});
-            localStorage.setItem('cookieEvidence', JSON.stringify(logs));
+            saveToLocalStorage();
         }
+
+        // clear all
+        function clearAllEvidence() {
+            if (confirm("本当にEvidence Logをすべて削除しますか？\nThis will clear all recorded evidence.")) {
+                document.getElementById('evidenceList').innerHTML = '';
+                localStorage.removeItem('cookieEvidence');
+            }
+        }
+
+        // localStorageに保存
+        function saveToLocalStorage() {
+            const items = [];
+            document.querySelectorAll('#evidenceList li').forEach(li => {
+                const text = li.textContent.replace('×', '').trim();
+                items.push(text);
+            });
+            localStorage.setItem('cookieEvidence', JSON.stringify(items));
+        }
+
+        // ページ読み込み時に復元
+        window.onload = function() {
+            const saved = localStorage.getItem('cookieEvidence');
+            if (!saved) return;
+
+            const list = document.getElementById('evidenceList');
+            const items = JSON.parse(saved);
+            items.forEach(text => {
+                const item = document.createElement('li');
+                item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between items-center";
+                item.innerHTML = `
+                    <div>${text}</div>
+                    <button onclick="this.parentElement.remove(); saveToLocalStorage()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
+                `;
+                list.appendChild(item);
+            });
+        };
 
         // Caesar Cipher Decoder
         function decodeCaesar() {
             const shift = parseInt(document.getElementById('shift').value) || 3;
             const input = document.getElementById('cipherInput').value.trim().toUpperCase();
-            let output = '';
-
-            output = input.split('').map(char => {
+            
+            let output = input.split('').map(char => {
                 if (char.match(/[A-Z]/)) {
-                    // シーザー暗号（右シフトの場合の復号は -shift）
                     return String.fromCharCode(((char.charCodeAt(0) - 65 - shift + 26) % 26) + 65);
                 }
                 return char;
@@ -182,28 +220,9 @@
 
             const outputDiv = document.getElementById('decodedOutput');
             outputDiv.innerHTML = `
-                <span class="text-teal-400 block text-sm mb-1">DECODED RESULT (${shift} shift)</span>
-                <span class="text-2xl">${output || 'No text to decode'}</span>
+                <span class="text-teal-400 block text-sm mb-2">DECODED (${shift} shift)</span>
+                <span class="text-2xl tracking-wider">${output || '暗号を入力してください'}</span>
             `;
-        }
-
-        // ページ読み込み時にEvidence Logを復元
-        window.onload = function() {
-            const logs = JSON.parse(localStorage.getItem('cookieEvidence') || '[]');
-            const list = document.getElementById('evidenceList');
-            logs.forEach(log => {
-                const item = document.createElement('li');
-                item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between items-center";
-                item.innerHTML = `
-                    <div>
-                        ${log.location ? `<span class="text-teal-400">${log.location}:</span> ` : ''}
-                        ${log.evidence}
-                    </div>
-                    <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
-                `;
-                list.appendChild(item);
-            });
-        };
     </script>
 </body>
 </html>
