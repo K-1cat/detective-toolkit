@@ -84,29 +84,6 @@
         <div class="max-w-4xl mx-auto px-6">
             <h3 class="text-4xl font-bold text-center mb-12 text-teal-400">Detective Tools</h3>
            
-            <!-- Evidence Log -->
-            <div class="mb-16">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="text-xl font-semibold">📝 Evidence Log</h4>
-                    <button onclick="clearAllEvidence()" 
-                            class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2 rounded-xl transition">
-                        Clear All
-                    </button>
-                </div>
-               
-                <div class="flex gap-3 mb-4">
-                    <input id="locationInput" type="text" placeholder="Place (ex: Fridge)" 
-                           class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
-                    <input id="evidenceInput" type="text" placeholder="Evidence or Notes" 
-                           class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white">
-                    <button onclick="addEvidence()" 
-                            class="bg-teal-500 hover:bg-teal-600 text-black font-medium px-6 py-3 rounded-xl transition">
-                        Add
-                    </button>
-                </div>
-                <ul id="evidenceList" class="space-y-3 text-sm"></ul>
-            </div>
-           
             <!-- Caesar Cipher Tool -->
             <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8">
                 <h4 class="text-xl font-semibold mb-6">Caesar Cipher Decoder</h4>
@@ -139,59 +116,13 @@
     
     <!-- Tailwind script to make classes work -->
     <script>
-        // Evidence Log
-        function addEvidence() {
-            const location = document.getElementById('locationInput').value.trim();
-            const evidence = document.getElementById('evidenceInput').value.trim();
-            if (!evidence) return;
-
-            const list = document.getElementById('evidenceList');
-            const item = document.createElement('li');
-            item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between items-center";
-            item.innerHTML = `
-                <div>
-                    ${location ? `<span class="text-teal-400">${location}:</span> ` : ''}
-                    ${evidence}
-                </div>
-                <button onclick="this.parentElement.remove(); saveToLocalStorage()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
-            `;
-            list.appendChild(item);
-            saveToLocalStorage();
-        }
-
-        function clearAllEvidence() {
-            if (confirm("本当にEvidence Logをすべて削除しますか？\nThis will clear all recorded evidence.")) {
-                document.getElementById('evidenceList').innerHTML = '';
-                localStorage.removeItem('cookieEvidence');
+        tailwind.config = {
+            content: [],
+            theme: {
+                extend: {}
             }
         }
-
-        function saveToLocalStorage() {
-            const items = [];
-            document.querySelectorAll('#evidenceList li').forEach(li => {
-                const text = li.textContent.replace('×', '').trim();
-                items.push(text);
-            });
-            localStorage.setItem('cookieEvidence', JSON.stringify(items));
-        }
-
-        // ページ読み込み時に復元
-        window.onload = function() {
-            const saved = localStorage.getItem('cookieEvidence');
-            if (!saved) return;
-            const list = document.getElementById('evidenceList');
-            const items = JSON.parse(saved);
-            items.forEach(text => {
-                const item = document.createElement('li');
-                item.className = "bg-zinc-800 p-4 rounded-2xl border border-zinc-700 flex justify-between items-center";
-                item.innerHTML = `
-                    <div>${text}</div>
-                    <button onclick="this.parentElement.remove(); saveToLocalStorage()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
-                `;
-                list.appendChild(item);
-            });
-        };
-
+        
         // Caesar Cipher Decoder
         function decodeCaesar() {
             const shift = parseInt(document.getElementById('shift').value) || 3;
