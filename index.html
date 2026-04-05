@@ -139,13 +139,6 @@
     
     <!-- Tailwind script to make classes work -->
     <script>
-        tailwind.config = {
-            content: [],
-            theme: {
-                extend: {}
-            }
-        }
-        
         // Evidence Log
         function addEvidence() {
             const location = document.getElementById('locationInput').value.trim();
@@ -160,14 +153,12 @@
                     ${location ? `<span class="text-teal-400">${location}:</span> ` : ''}
                     ${evidence}
                 </div>
-                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
+                <button onclick="this.parentElement.remove(); saveToLocalStorage()" class="text-red-400 hover:text-red-500 text-xl leading-none">×</button>
             `;
             list.appendChild(item);
-
             saveToLocalStorage();
         }
 
-        // clear all
         function clearAllEvidence() {
             if (confirm("本当にEvidence Logをすべて削除しますか？\nThis will clear all recorded evidence.")) {
                 document.getElementById('evidenceList').innerHTML = '';
@@ -175,7 +166,6 @@
             }
         }
 
-        // localStorageに保存
         function saveToLocalStorage() {
             const items = [];
             document.querySelectorAll('#evidenceList li').forEach(li => {
@@ -189,7 +179,6 @@
         window.onload = function() {
             const saved = localStorage.getItem('cookieEvidence');
             if (!saved) return;
-
             const list = document.getElementById('evidenceList');
             const items = JSON.parse(saved);
             items.forEach(text => {
@@ -207,7 +196,7 @@
         function decodeCaesar() {
             const shift = parseInt(document.getElementById('shift').value) || 3;
             const input = document.getElementById('cipherInput').value.trim().toUpperCase();
-            
+           
             let output = input.split('').map(char => {
                 if (char.match(/[A-Z]/)) {
                     return String.fromCharCode(((char.charCodeAt(0) - 65 - shift + 26) % 26) + 65);
@@ -218,8 +207,9 @@
             const outputDiv = document.getElementById('decodedOutput');
             outputDiv.innerHTML = `
                 <span class="text-teal-400 block text-sm mb-2">DECODED (${shift} shift)</span>
-                <span class="text-2xl tracking-wider">${output || '暗号を入力してください'}</span>
+                <span class="text-2xl tracking-wider">${output || 'No text to decode'}</span>
             `;
+        }
     </script>
 </body>
 </html>
